@@ -2,9 +2,24 @@ import "../styles/HomePage.css";
 import "../styles/header.css";
 import { Header } from "../components/Header";
 import CheckMark from "../assets/images/icons/checkmark.png";
-import { products } from "../../start/data/products";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 function Homepage() {
+  const [products, setProducts] = useState([]);
+  // fetch("http://localhost:3000/api/products")
+  //   .then((response) => {
+  //     return response.json();
+  //   })
+  //   .then((data) => {
+  //     console.log(data);
+  //   });
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/products").then((response) => {
+      setProducts(response.data);
+    });
+  }, []);
+
   return (
     <>
       <link
