@@ -4,10 +4,10 @@ import { Header } from "../components/Header";
 import CheckMark from "../assets/images/icons/checkmark.png";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { formatMoney } from "./utils/money";
 
-function Homepage() {
+function Homepage({ cart }) {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
 
   // fetch("http://localhost:3000/api/products")
   //   .then((response) => {
@@ -19,10 +19,6 @@ function Homepage() {
   useEffect(() => {
     axios.get("http://localhost:3000/api/products").then((response) => {
       setProducts(response.data);
-    });
-
-    axios.get("http://localhost:3000/api/cart-items").then((response) => {
-      setCart(response.data);
     });
   }, []);
 
@@ -61,7 +57,7 @@ function Homepage() {
                 </div>
 
                 <div className="product-price">
-                  {(product.priceCents / 100).toFixed(2)}
+                  {formatMoney(product.priceCents)}
                 </div>
 
                 <div className="product-quantity-container">
