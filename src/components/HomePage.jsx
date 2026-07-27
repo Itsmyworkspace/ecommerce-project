@@ -1,26 +1,28 @@
 import "../styles/HomePage.css";
 import "../styles/header.css";
 import { Header } from "../components/Header";
-import CheckMark from "../assets/images/icons/checkmark.png";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { formatMoney } from "./utils/money";
+import { ProductsGrid } from "./ProductsGrid";
+import { useSearchParams } from "react-router";
 
-function Homepage({ cart }) {
+function Homepage({ cart, loadCart }) {
   const [products, setProducts] = useState([]);
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search");
 
-  // fetch("http://localhost:3000/api/products")
-  //   .then((response) => {
-  //     return response.json();
-  //   })
-  //   .then((data) => {
-  //     console.log(data);
-  //   });
   useEffect(() => {
-    axios.get("http://localhost:3000/api/products").then((response) => {
-      setProducts(response.data);
-    });
-  }, []);
+    const getProducts = async () => {
+      if (search) {
+        const urlPath = search
+          ? `/api/products?search=${search}`
+          : "/api/products";
+        const getProductsResponse = await axios.get(urlPath);
+        setProducts(getProductsResponse.data);
+      }
+    };
+    getProducts();
+  }, [search]);
 
   return (
     <>
@@ -34,61 +36,7 @@ function Homepage({ cart }) {
       <Header cart={cart} />
 
       <div className="home-page">
-        <div className="products-grid">
-          {products.map((product) => {
-            return (
-              <div key={product.id} className="product-container">
-                <div className="product-image-container">
-                  <img className="product-image" src={product.image} />
-                </div>
-
-                <div className="product-name limit-text-to-2-lines">
-                  {product.name}
-                </div>
-
-                <div className="product-rating-container">
-                  <img
-                    className="product-rating-stars"
-                    src={`images/ratings/rating-${product.rating.stars * 10}.png`}
-                  />
-                  <div className="product-rating-count link-primary">
-                    {product.rating.count}
-                  </div>
-                </div>
-
-                <div className="product-price">
-                  {formatMoney(product.priceCents)}
-                </div>
-
-                <div className="product-quantity-container">
-                  <select>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                  </select>
-                </div>
-
-                <div className="product-spacer"></div>
-
-                <div className="added-to-cart">
-                  <img src={CheckMark} />
-                  Added
-                </div>
-
-                <button className="add-to-cart-button button-primary">
-                  Add to Cart
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        <ProductsGrid products={products} loadCart={loadCart} />
       </div>
     </>
   );
